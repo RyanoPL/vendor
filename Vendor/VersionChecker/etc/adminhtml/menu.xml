@@ -2,6 +2,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
         <add id="Vendor_VersionChecker::updates" title="T-ZQA eCom" module="Vendor_VersionChecker" sortOrder="90" parent="Magento_Backend::system" resource="Vendor_VersionChecker::updates"/>
-        <add id="Vendor_VersionChecker::check" title="Global Payments Module Status" module="Vendor_VersionChecker" sortOrder="10" parent="Vendor_VersionChecker::updates" action="versionchecker/check/index" resource="Vendor_VersionChecker::updates"/>
+        <add id="Vendor_VersionChecker::check" title="Global Payments Module Status" module="Vendor_VersionChecker" sortOrder="10" parent="Vendor_VersionChecker::updates" action="versionchecker/check/index" resource="Vendor_VersionChecker::check"/>
     </menu>
 </config>

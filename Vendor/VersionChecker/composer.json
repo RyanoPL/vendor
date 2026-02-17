@@ -1,0 +1,21 @@
+{
+  "name": "ryanopl/vendor-versionchecker",
+  "description": "Global Payments Module Status helper for Magento 2 (Version Checker)",
+  "type": "magento2-module",
+  "version": "1.0.1",
+  "license": [
+    "proprietary"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Vendor\\VersionChecker\\": ""
+    }
+  },
+  "require": {
+    "php": ">=7.4",
+    "magento/framework": ">=102.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <vendor_versionchecker>
+            <general>
+                <enabled>1</enabled>
+                <target_module_name>GlobalPayments_PaymentGateway</target_module_name>
+                <repo_owner>globalpayments</repo_owner>
+                <repo_name>magento2-2.0-plugin</repo_name>
+                <cache_hours>6</cache_hours>
+            </general>
+        </vendor_versionchecker>
+    </default>
+</config>

@@ -8,6 +8,7 @@ use Magento\Framework\Notification\MessageInterface;
 use Magento\Framework\Component\ComponentRegistrar;
 use Magento\Framework\Filesystem\Directory\ReadFactory;
 use Magento\Framework\HTTP\Client\Curl;
+use Vendor\VersionChecker\Model\Service\VersionService;
 
 class UpdateNotification implements MessageInterface
 {
@@ -17,15 +18,18 @@ class UpdateNotification implements MessageInterface
     protected $componentRegistrar;
     protected $readFactory;
     protected $curl;
+    protected $versionService;
 
     public function __construct(
         ComponentRegistrar $componentRegistrar,
         ReadFactory $readFactory,
-        Curl $curl
+        Curl $curl,
+        VersionService $versionService
     ) {
         $this->componentRegistrar = $componentRegistrar;
         $this->readFactory = $readFactory;
         $this->curl = $curl;
+        $this->versionService = $versionService;
     }
 
     public function getIdentity()
@@ -35,6 +39,9 @@ class UpdateNotification implements MessageInterface
 
     public function isDisplayed()
     {
+        if (!$this->versionService->isEnabled()) {
+            return false;
+        }
         $current = $this->getCurrentVersion();
         $latest = $this->getLatestVersion();
         
@@ -48,7 +55,12 @@ class UpdateNotification implements MessageInterface
     public function getText()
     {
         $latest = $this->getLatestVersion();
-        return __("<b>Global Payments:</b> Dostępna jest nowa wersja wtyczki (%1). Zaktualizuj ją: <code>composer update globalpayments/magento2-2.0-plugin</code>", $latest);
+        return __(
+            "<b>Global Payments:</b> Dostępna jest nowa wersja wtyczki (%1). " .
+            "Aby ją zaktualizować, przejdź do: <b>System → T-ZQA eCom → Global Payments Module Status</b> " .
+            "i użyj dostępnego tam przycisku aktualizacji.",
+            $latest
+        );
     }
 
     public function getSeverity()
@@ -58,60 +70,13 @@ class UpdateNotification implements MessageInterface
 
     public function getCurrentVersion() // zmienione z private na public
     {
-        $path = $this->componentRegistrar->getPath(ComponentRegistrar::MODULE, self::TARGET_MODULE_NAME);
-        if (!$path) {
-            return '0.0.0';
-        }
-        
-        try {
-            $directoryRead = $this->readFactory->create($path);
-            $content = $directoryRead->readFile('composer.json');
-            $composerData = json_decode($content, true);
-            return $composerData['version'] ?? '0.0.0';
-        } catch (\Exception $e) {
-            return '0.0.0';
-        }
+        return $this->versionService->getCurrentVersion();
     }
 
     public function getLatestVersion()
-	{
-		$url = 'https://api.github.com';
-		
-		$options = [
-			'http' => [
-				'method' => 'GET',
-				'header' => [
-					'User-Agent: Magento2-Version-Checker',
-					'Accept: application/vnd.github.v3+json'
-				],
-				'timeout' => 10,
-				'ignore_errors' => true
-			],
-			'ssl' => [
-				'verify_peer' => false,
-				'verify_peer_name' => false
-			]
-		];
-
-		try {
-			$context = stream_context_create($options);
-			$response = file_get_contents($url, false, $context);
-			
-			if ($response === false) {
-				return null;
-			}
-
-			$data = json_decode($response, true);
-			
-			// Wyciągamy pierwszy tag z listy [0]['name']
-			if (is_array($data) && isset($data[0]['name'])) {
-				return ltrim($data[0]['name'], 'v');
-			}
-		} catch (\Exception $e) {
-			return null;
-		}
-		return null;
-	}
+    {
+        return $this->versionService->getCachedLatestVersion();
+    }
 
 }
 ?>

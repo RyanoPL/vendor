@@ -4,53 +4,34 @@ namespace Vendor\VersionChecker\Controller\Adminhtml\Check;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\View\Result\PageFactory;
+use Vendor\VersionChecker\Model\Service\VersionService;
 
 class Index extends Action
 {
     protected $directoryList;
+    protected $pageFactory;
+    protected $versionService;
 
-    public function __construct(Context $context, DirectoryList $directoryList) {
+    public function __construct(Context $context, DirectoryList $directoryList, PageFactory $pageFactory, VersionService $versionService) {
         parent::__construct($context);
         $this->directoryList = $directoryList;
+        $this->pageFactory = $pageFactory;
+        $this->versionService = $versionService;
     }
 
     public function execute() {
         $targetPath = $this->directoryList->getPath('app') . '/code/GlobalPayments/PaymentGateway';
-        $composerFile = $targetPath . '/composer.json';
-        $currentVersion = '0.0.0';
-
-        if (file_exists($composerFile)) {
-            $composerData = json_decode(file_get_contents($composerFile), true);
-            $currentVersion = $composerData['version'] ?? '0.0.0';
-        }
-
-        $latestVersion = $currentVersion;
-        $repoUrl = "https://github.com/globalpayments/magento2-2.0-plugin";
-        
-        // Pobieranie wersji przez GIT
-        $gitCmd = "git ls-remote --tags " . escapeshellarg($repoUrl) . " | grep -oP 'refs/tags/v?\\K[0-9]+\\.[0-9]+\\.[0-9]+' | sort -V | tail -n 1";
-        $gitOutput = shell_exec($gitCmd);
-        
-        if ($gitOutput) {
-            $latestVersion = trim($gitOutput);
-        }
+        $repoUrl = "https://github.com/" . $this->versionService->getRepoOwner() . "/" . $this->versionService->getRepoName();
 
         $updateTo = $this->getRequest()->getParam('update_to');
         if ($updateTo) { 
             return $this->runUpdate($updateTo, $targetPath, $repoUrl); 
         }
 
-        $currentVersion = trim($currentVersion);
-        $latestVersion = trim($latestVersion);
-
-        if (version_compare($currentVersion, $latestVersion, '<')) {
-            $installUrl = $this->getUrl('*/*/*', ['update_to' => $latestVersion]);
-            $this->messageManager->addWarning(__("WYKRYTO AKTUALIZACJĘ! Nowa wersja: <b>%1</b> (Twoja: %2).<br/><a href='%3' style='background:#eb5202; color:#fff; padding:8px 15px; text-decoration:none; border-radius:3px; display:inline-block; margin-top:10px; font-weight:bold;'>INSTALUJ AKTUALIZACJĘ I URUCHOM SETUP:UPGRADE</a>", $latestVersion, $currentVersion, $installUrl));
-        } else {
-            $this->messageManager->addSuccess(__("Wtyczka Global Payments (Wersja %1) jest aktualna.", $currentVersion));
-        }
-
-        return $this->resultRedirectFactory->create()->setPath('admin/dashboard/index');
+        $resultPage = $this->pageFactory->create();
+        $resultPage->getConfig()->getTitle()->set(__('Global Payments Module Status'));
+        return $resultPage;
     }
 
     private function runUpdate($version, $targetPath, $repoUrl) {
@@ -89,5 +70,10 @@ class Index extends Action
         }
         
         return $this->resultRedirectFactory->create()->setPath('admin/dashboard/index');
+    }
+
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed('Vendor_VersionChecker::check');
     }
 }
