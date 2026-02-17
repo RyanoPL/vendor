@@ -1,5 +1,7 @@
 # Global Payments Version Checker for Magento 2
 
+https://github.com/globalpayments/magento2-2.0-plugin
+
 This repository contains a helper module for Magento 2 that:
 
 - Checks for available updates of the Global Payments payment gateway module
