@@ -53,7 +53,7 @@ class Index extends Action
             shell_exec($cloneCmd);
             
             if (!file_exists($tmpDir . '/composer.json')) {
-                throw new \Exception("Błąd klonowania GIT. Sprawdź połączenie.");
+                throw new \Exception("GIT clone error for Global Payments module. Please check the repository and connection.");
             }
             
             // 2. Podmiana plików
@@ -70,7 +70,7 @@ class Index extends Action
             // 4. CZYSZCZENIE CACHE
             shell_exec("cd " . escapeshellarg($magentoRoot) . " && $phpPath bin/magento cache:clean 2>&1");
             
-            $this->messageManager->addSuccess(__("SUKCES! Wersja %1 wgrana i aktywowana. <br/><b>Log systemowy:</b><pre>%2</pre>", $version, $upgradeOutput));
+            $this->messageManager->addSuccess(__("SUCCESS! Global Payments module version %1 has been deployed and activated. <br/><b>System log:</b><pre>%2</pre>", $version, $upgradeOutput));
             
         } catch (\Exception $e) { 
             $this->messageManager->addError(nl2br($e->getMessage())); 
@@ -117,7 +117,7 @@ class Index extends Action
                 }
             }
             if ($sourceModulePath === null) {
-                throw new \Exception("Nie znaleziono poprawnej struktury modułu Version Checker w repozytorium.");
+                throw new \Exception("Unable to find a valid Version Checker module structure in the repository.");
             }
             shell_exec("rm -rf " . escapeshellarg($tmpDir . '/.git'));
             if (!is_dir($targetPath)) {
@@ -129,7 +129,7 @@ class Index extends Action
             $upgradeCmd = "cd " . escapeshellarg($magentoRoot) . " && $phpPath bin/magento setup:upgrade 2>&1";
             $upgradeOutput = shell_exec($upgradeCmd);
             shell_exec("cd " . escapeshellarg($magentoRoot) . " && $phpPath bin/magento cache:clean 2>&1");
-            $this->messageManager->addSuccess(__("SUKCES! Moduł Version Checker w wersji %1 został wgrany i aktywowany. <br/><b>Log systemowy:</b><pre>%2</pre>", $version, $upgradeOutput));
+            $this->messageManager->addSuccess(__("SUCCESS! Version Checker module version %1 has been deployed and activated. <br/><b>System log:</b><pre>%2</pre>", $version, $upgradeOutput));
         } catch (\Exception $e) { 
             $this->messageManager->addError(nl2br($e->getMessage())); 
         }

@@ -14,42 +14,42 @@ $checkerLatest = $block->getCheckerLatestVersion();
 
 <?php if (!$block->isEnabled()): ?>
     <div class="message message-notice">
-        <div>Powiadomienia są wyłączone w konfiguracji.</div>
+        <div>Notifications are disabled in configuration.</div>
     </div>
 <?php else: ?>
     <div class="messages">
         <?php if ($latest && version_compare($current, $latest, '<')): ?>
             <div class="message message-warning">
-                <div>Wykryto aktualizację. Najnowsza: <strong><?= $latest ?></strong>, Twoja: <?= $current ?></div>
+                <div>Update detected. Latest: <strong><?= $latest ?></strong>, Installed: <?= $current ?></div>
             </div>
             <p>
-                <a class="action-default scalable" style="background:#eb5202;color:#fff;padding:8px 15px;border-radius:3px;text-decoration:none" href="<?= $block->escapeUrl($block->getUpdateUrl($latest)) ?>">Zainstaluj aktualizację</a>
+                <a class="action-default scalable" style="background:#eb5202;color:#fff;padding:8px 15px;border-radius:3px;text-decoration:none" href="<?= $block->escapeUrl($block->getUpdateUrl($latest)) ?>">Install update</a>
             </p>
         <?php elseif ($latest): ?>
             <div class="message message-success">
-                <div>Wtyczka jest aktualna. Wersja: <?= $current ?></div>
+                <div>The plugin is up to date. Version: <?= $current ?></div>
             </div>
         <?php else: ?>
             <div class="message message-error">
-                <div>Nie udało się pobrać najnowszej wersji.</div>
+                <div>Failed to fetch the latest plugin version.</div>
             </div>
         <?php endif; ?>
         <hr/>
-        <h2>Global Payments Module Status – wersja modułu sprawdzającego</h2>
+        <h2>Global Payments Module Status – Version Checker module status</h2>
         <?php if ($checkerLatest && version_compare($checkerCurrent, $checkerLatest, '<')): ?>
             <div class="message message-warning">
-                <div>Wykryto nowszą wersję modułu Version Checker. Najnowsza: <strong><?= $checkerLatest ?></strong>, Twoja: <?= $checkerCurrent ?></div>
+                <div>A newer Version Checker module is available. Latest: <strong><?= $checkerLatest ?></strong>, Installed: <?= $checkerCurrent ?></div>
             </div>
             <p>
-                <a class="action-default scalable" style="background:#eb5202;color:#fff;padding:8px 15px;border-radius:3px;text-decoration:none" href="<?= $block->escapeUrl($block->getCheckerUpdateUrl($checkerLatest)) ?>">Zainstaluj aktualizację modułu Version Checker</a>
+                <a class="action-default scalable" style="background:#eb5202;color:#fff;padding:8px 15px;border-radius:3px;text-decoration:none" href="<?= $block->escapeUrl($block->getCheckerUpdateUrl($checkerLatest)) ?>">Install Version Checker update</a>
             </p>
         <?php elseif ($checkerLatest): ?>
             <div class="message message-success">
-                <div>Moduł Version Checker jest aktualny. Wersja: <?= $checkerCurrent ?></div>
+                <div>The Version Checker module is up to date. Version: <?= $checkerCurrent ?></div>
             </div>
         <?php else: ?>
             <div class="message message-error">
-                <div>Nie udało się pobrać najnowszej wersji modułu Version Checker.</div>
+                <div>Failed to fetch the latest Version Checker module version.</div>
             </div>
         <?php endif; ?>
     </div>

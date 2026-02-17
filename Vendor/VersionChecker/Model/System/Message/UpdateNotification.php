@@ -64,7 +64,7 @@ class UpdateNotification implements MessageInterface
 
         if ($latest && $current !== '0.0.0' && version_compare($current, $latest, '<')) {
             $parts[] = __(
-                "<b>Global Payments:</b> Dostępna jest nowa wersja wtyczki (%1). Twoja wersja: %2.",
+                "<b>Global Payments:</b> A new plugin version is available (%1). Your version: %2.",
                 $latest,
                 $current
             );
@@ -72,19 +72,19 @@ class UpdateNotification implements MessageInterface
 
         if ($selfLatest && $selfCurrent !== '0.0.0' && version_compare($selfCurrent, $selfLatest, '<')) {
             $parts[] = __(
-                "<b>Global Payments Module Status:</b> Dostępna jest nowa wersja modułu (%1). Twoja wersja: %2.",
+                "<b>Global Payments Module Status:</b> A new Version Checker module version is available (%1). Your version: %2.",
                 $selfLatest,
                 $selfCurrent
             );
         } else {
             $parts[] = __(
-                "<b>Global Payments Module Status:</b> Moduł jest aktualny (wersja %1).",
+                "<b>Global Payments Module Status:</b> The Version Checker module is up to date (version %1).",
                 $selfCurrent
             );
         }
 
         $parts[] = __(
-            "Aby zaktualizować moduły, przejdź do: <b>System → T-ZQA eCom → Global Payments Module Status</b> i użyj dostępnych tam przycisków aktualizacji."
+            "To update the modules, go to: <b>System → T-ZQA eCom → Global Payments Module Status</b> and use the available update buttons there."
         );
 
         return implode('<br/>', $parts);
