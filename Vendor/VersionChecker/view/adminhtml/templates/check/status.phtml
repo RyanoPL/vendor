@@ -4,13 +4,6 @@ $latest = $block->getLatestVersion();
 $checkerCurrent = $block->getCheckerCurrentVersion();
 $checkerLatest = $block->getCheckerLatestVersion();
 ?>
-<div class="page-main-actions">
-    <div class="page-actions">
-        <div class="page-actions-inner">
-            <h1 class="page-title">Global Payments Module Status</h1>
-        </div>
-    </div>
-</div>
 
 <?php if (!$block->isEnabled()): ?>
     <div class="message message-notice">
@@ -18,6 +11,7 @@ $checkerLatest = $block->getCheckerLatestVersion();
     </div>
 <?php else: ?>
     <div class="messages">
+        <h2>Global Payments – wtyczka płatności</h2>
         <?php if ($latest && version_compare($current, $latest, '<')): ?>
             <div class="message message-warning">
                 <div>Wykryto aktualizację. Najnowsza: <strong><?= $latest ?></strong>, Twoja: <?= $current ?></div>
