@@ -40,6 +40,9 @@ $checkerLatest = $block->getCheckerLatestVersion();
             <div class="message message-warning">
                 <div>Wykryto nowszą wersję modułu Version Checker. Najnowsza: <strong><?= $checkerLatest ?></strong>, Twoja: <?= $checkerCurrent ?></div>
             </div>
+            <p>
+                <a class="action-default scalable" style="background:#eb5202;color:#fff;padding:8px 15px;border-radius:3px;text-decoration:none" href="<?= $block->escapeUrl($block->getCheckerUpdateUrl($checkerLatest)) ?>">Zainstaluj aktualizację modułu Version Checker</a>
+            </p>
         <?php elseif ($checkerLatest): ?>
             <div class="message message-success">
                 <div>Moduł Version Checker jest aktualny. Wersja: <?= $checkerCurrent ?></div>

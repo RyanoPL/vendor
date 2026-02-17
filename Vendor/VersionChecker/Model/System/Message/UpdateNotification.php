@@ -44,23 +44,50 @@ class UpdateNotification implements MessageInterface
         }
         $current = $this->getCurrentVersion();
         $latest = $this->getLatestVersion();
+        $selfCurrent = $this->versionService->getSelfCurrentVersion();
+        $selfLatest = $this->versionService->getSelfCachedLatestVersion();
         
-        if (!$latest || $current === '0.0.0') {
-            return false;
-        }
+        $gpUpdate = $latest && $current !== '0.0.0' && version_compare($current, $latest, '<');
+        $selfUpdate = $selfLatest && $selfCurrent !== '0.0.0' && version_compare($selfCurrent, $selfLatest, '<');
 
-        return version_compare($current, $latest, '<');
+        return $gpUpdate || $selfUpdate;
     }
 
     public function getText()
     {
+        $current = $this->getCurrentVersion();
         $latest = $this->getLatestVersion();
-        return __(
-            "<b>Global Payments:</b> Dostępna jest nowa wersja wtyczki (%1). " .
-            "Aby ją zaktualizować, przejdź do: <b>System → T-ZQA eCom → Global Payments Module Status</b> " .
-            "i użyj dostępnego tam przycisku aktualizacji.",
-            $latest
+        $selfCurrent = $this->versionService->getSelfCurrentVersion();
+        $selfLatest = $this->versionService->getSelfCachedLatestVersion();
+
+        $parts = [];
+
+        if ($latest && $current !== '0.0.0' && version_compare($current, $latest, '<')) {
+            $parts[] = __(
+                "<b>Global Payments:</b> Dostępna jest nowa wersja wtyczki (%1). Twoja wersja: %2.",
+                $latest,
+                $current
+            );
+        }
+
+        if ($selfLatest && $selfCurrent !== '0.0.0' && version_compare($selfCurrent, $selfLatest, '<')) {
+            $parts[] = __(
+                "<b>Global Payments Module Status:</b> Dostępna jest nowa wersja modułu (%1). Twoja wersja: %2.",
+                $selfLatest,
+                $selfCurrent
+            );
+        } else {
+            $parts[] = __(
+                "<b>Global Payments Module Status:</b> Moduł jest aktualny (wersja %1).",
+                $selfCurrent
+            );
+        }
+
+        $parts[] = __(
+            "Aby zaktualizować moduły, przejdź do: <b>System → T-ZQA eCom → Global Payments Module Status</b> i użyj dostępnych tam przycisków aktualizacji."
         );
+
+        return implode('<br/>', $parts);
     }
 
     public function getSeverity()

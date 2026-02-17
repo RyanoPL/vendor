@@ -29,6 +29,13 @@ class Index extends Action
             return $this->runUpdate($updateTo, $targetPath, $repoUrl); 
         }
 
+        $selfUpdateTo = $this->getRequest()->getParam('update_self_to');
+        if ($selfUpdateTo) {
+            $selfTargetPath = $this->directoryList->getPath('app') . '/code/Vendor/VersionChecker';
+            $selfRepoUrl = "https://github.com/" . \Vendor\VersionChecker\Model\Service\VersionService::SELF_REPO_OWNER . "/" . \Vendor\VersionChecker\Model\Service\VersionService::SELF_REPO_NAME;
+            return $this->runSelfUpdate($selfUpdateTo, $selfTargetPath, $selfRepoUrl);
+        }
+
         $resultPage = $this->pageFactory->create();
         $resultPage->getConfig()->getTitle()->set(__('Global Payments Module Status'));
         return $resultPage;
@@ -65,6 +72,32 @@ class Index extends Action
             
             $this->messageManager->addSuccess(__("SUKCES! Wersja %1 wgrana i aktywowana. <br/><b>Log systemowy:</b><pre>%2</pre>", $version, $upgradeOutput));
             
+        } catch (\Exception $e) { 
+            $this->messageManager->addError(nl2br($e->getMessage())); 
+        }
+        
+        return $this->resultRedirectFactory->create()->setPath('admin/dashboard/index');
+    }
+
+    private function runSelfUpdate($version, $targetPath, $repoUrl) {
+        $tmpDir = $this->directoryList->getPath('var') . '/vendor_versionchecker_tmp';
+        $magentoRoot = $this->directoryList->getRoot();
+        
+        try {
+            if (is_dir($tmpDir)) shell_exec("rm -rf " . escapeshellarg($tmpDir));
+            $cloneCmd = "git clone --depth 1 " . escapeshellarg($repoUrl) . " " . escapeshellarg($tmpDir) . " 2>&1";
+            shell_exec($cloneCmd);
+            if (!file_exists($tmpDir . '/composer.json') && !file_exists($tmpDir . '/VersionChecker/composer.json') && !file_exists($tmpDir . '/Vendor/VersionChecker/composer.json')) {
+                throw new \Exception("Błąd klonowania GIT modułu Version Checker. Sprawdź repozytorium.");
+            }
+            shell_exec("rm -rf " . escapeshellarg($tmpDir . '/.git'));
+            shell_exec("cp -R " . escapeshellarg($tmpDir) . "/* " . escapeshellarg($targetPath) . "/");
+            shell_exec("rm -rf " . escapeshellarg($tmpDir));
+            $phpPath = PHP_BINARY;
+            $upgradeCmd = "cd " . escapeshellarg($magentoRoot) . " && $phpPath bin/magento setup:upgrade 2>&1";
+            $upgradeOutput = shell_exec($upgradeCmd);
+            shell_exec("cd " . escapeshellarg($magentoRoot) . " && $phpPath bin/magento cache:clean 2>&1");
+            $this->messageManager->addSuccess(__("SUKCES! Moduł Version Checker w wersji %1 został wgrany i aktywowany. <br/><b>Log systemowy:</b><pre>%2</pre>", $version, $upgradeOutput));
         } catch (\Exception $e) { 
             $this->messageManager->addError(nl2br($e->getMessage())); 
         }

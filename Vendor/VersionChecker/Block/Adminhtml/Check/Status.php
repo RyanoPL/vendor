@@ -37,6 +37,11 @@ class Status extends Template
         return $this->versionService->getSelfCachedLatestVersion();
     }
 
+    public function getCheckerUpdateUrl($version)
+    {
+        return $this->getUrl('*/check/index', ['update_self_to' => $version]);
+    }
+
     public function isEnabled()
     {
         return $this->versionService->isEnabled();
